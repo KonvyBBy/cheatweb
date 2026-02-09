@@ -523,3 +523,406 @@ window.editProduct = editProduct;
 window.deleteProduct = deleteProduct;
 window.updateProductStatus = updateProductStatus;
 window.removeDurationField = removeDurationField;
+
+// ==================== Category Management ====================
+
+const CATEGORIES_KEY = 'astral_categories';
+let currentCategory = null;
+
+// Get categories
+function getCategories() {
+    const categories = localStorage.getItem(CATEGORIES_KEY);
+    return categories ? JSON.parse(categories) : [];
+}
+
+// Save categories
+function saveCategories(categories) {
+    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
+}
+
+// Load categories list
+function loadCategoriesList() {
+    const categories = getCategories();
+    const container = document.getElementById('categories-list');
+    
+    if (!container) return;
+    
+    if (categories.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 2rem;">No categories yet. Click "+ Add Category" to create one.</p>';
+        return;
+    }
+    
+    container.innerHTML = categories.map(category => `
+        <div class="category-item">
+            <div class="category-info">
+                <h3>${category.name}</h3>
+                <p>${category.description || 'No description'}</p>
+            </div>
+            <div class="category-actions">
+                <button class="btn btn-secondary btn-small" onclick="editCategory('${category.id}')">Edit</button>
+                <button class="btn btn-danger btn-small" onclick="deleteCategory('${category.id}')">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Open category modal
+function openCategoryModal(categoryId = null) {
+    const modal = document.getElementById('category-modal');
+    const title = document.getElementById('category-modal-title');
+    const form = document.getElementById('category-form');
+    
+    if (categoryId) {
+        // Edit mode
+        const categories = getCategories();
+        const category = categories.find(c => c.id === categoryId);
+        if (!category) return;
+        
+        title.textContent = 'Edit Category';
+        document.getElementById('category-id').value = category.id;
+        document.getElementById('category-name').value = category.name;
+        document.getElementById('category-description').value = category.description || '';
+        currentCategory = category;
+    } else {
+        // Add mode
+        title.textContent = 'Add Category';
+        form.reset();
+        document.getElementById('category-id').value = '';
+        currentCategory = null;
+    }
+    
+    modal.style.display = 'flex';
+}
+
+// Close category modal
+function closeCategoryModal() {
+    document.getElementById('category-modal').style.display = 'none';
+    document.getElementById('category-form').reset();
+    currentCategory = null;
+}
+
+// Edit category
+function editCategory(categoryId) {
+    openCategoryModal(categoryId);
+}
+
+// Delete category
+function deleteCategory(categoryId) {
+    if (!confirm('Are you sure you want to delete this category?')) return;
+    
+    let categories = getCategories();
+    categories = categories.filter(c => c.id !== categoryId);
+    saveCategories(categories);
+    
+    // Remove category from all products
+    let products = getProducts();
+    products = products.map(product => {
+        if (product.categories && product.categories.includes(categoryId)) {
+            product.categories = product.categories.filter(c => c !== categoryId);
+        }
+        return product;
+    });
+    saveProducts(products);
+    
+    loadCategoriesList();
+    showNotification('Category deleted successfully');
+}
+
+// Handle category form submit
+function handleCategorySubmit(e) {
+    e.preventDefault();
+    
+    const categoryId = document.getElementById('category-id').value;
+    const name = document.getElementById('category-name').value.trim();
+    const description = document.getElementById('category-description').value.trim();
+    
+    let categories = getCategories();
+    
+    if (categoryId) {
+        // Edit existing category
+        const index = categories.findIndex(c => c.id === categoryId);
+        if (index !== -1) {
+            categories[index] = {
+                ...categories[index],
+                name,
+                description
+            };
+        }
+    } else {
+        // Add new category
+        const newCategory = {
+            id: 'cat_' + Date.now(),
+            name,
+            description
+        };
+        categories.push(newCategory);
+    }
+    
+    saveCategories(categories);
+    loadCategoriesList();
+    closeCategoryModal();
+    showNotification(categoryId ? 'Category updated successfully' : 'Category added successfully');
+}
+
+// ==================== Enhanced Product Features Management ====================
+
+let currentFeatures = [];
+
+// Load features list in modal
+function loadFeaturesList(features) {
+    currentFeatures = features || [];
+    const container = document.getElementById('features-list-container');
+    
+    if (!container) return;
+    
+    if (currentFeatures.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">No features added yet.</p>';
+        return;
+    }
+    
+    container.innerHTML = currentFeatures.map((feature, index) => `
+        <div class="feature-item">
+            <span class="feature-text">${feature}</span>
+            <button type="button" class="btn-remove-feature" onclick="removeFeature(${index})" title="Remove feature">×</button>
+        </div>
+    `).join('');
+}
+
+// Add feature
+function addFeature() {
+    const input = document.getElementById('new-feature-input');
+    const feature = input.value.trim();
+    
+    if (!feature) {
+        showNotification('Please enter a feature', 2000);
+        return;
+    }
+    
+    currentFeatures.push(feature);
+    loadFeaturesList(currentFeatures);
+    input.value = '';
+    input.focus();
+}
+
+// Remove feature
+function removeFeature(index) {
+    currentFeatures.splice(index, 1);
+    loadFeaturesList(currentFeatures);
+}
+
+// Load category checkboxes in product modal
+function loadCategoryCheckboxes(productCategories = []) {
+    const container = document.getElementById('product-categories');
+    const categories = getCategories();
+    
+    if (!container) return;
+    
+    if (categories.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">No categories available. Create categories first.</p>';
+        return;
+    }
+    
+    container.innerHTML = categories.map(category => `
+        <label class="category-checkbox">
+            <input type="checkbox" value="${category.id}" ${productCategories.includes(category.id) ? 'checked' : ''}>
+            <span>${category.name}</span>
+        </label>
+    `).join('');
+}
+
+// Get selected categories
+function getSelectedCategories() {
+    const checkboxes = document.querySelectorAll('#product-categories input[type="checkbox"]:checked');
+    return Array.from(checkboxes).map(cb => cb.value);
+}
+
+// ==================== Enhanced Product Management ====================
+
+// Override the original openProductModal to use new features system
+const originalOpenProductModal = openProductModal;
+function openProductModal(productId = null) {
+    const modal = document.getElementById('product-modal');
+    const title = document.getElementById('modal-title');
+    const form = document.getElementById('product-form');
+    
+    if (productId) {
+        const products = getProducts();
+        const product = products.find(p => p.id == productId);
+        if (!product) return;
+        
+        title.textContent = 'Edit Product';
+        document.getElementById('product-id').value = product.id;
+        document.getElementById('product-name').value = product.name;
+        document.getElementById('product-badge').value = product.badge || '';
+        document.getElementById('product-price').value = product.price;
+        document.getElementById('product-period').value = product.period || '';
+        document.getElementById('product-description').value = product.description || '';
+        document.getElementById('product-image').value = product.image || '';
+        document.getElementById('product-status').value = product.status;
+        document.getElementById('product-featured').checked = product.featured || false;
+        
+        // Load features
+        loadFeaturesList(product.features || []);
+        
+        // Load categories
+        loadCategoryCheckboxes(product.categories || []);
+        
+        // Load durations
+        loadDurationsInForm(product.durations || []);
+        
+        currentProduct = product;
+    } else {
+        title.textContent = 'Add Product';
+        form.reset();
+        document.getElementById('product-id').value = '';
+        currentFeatures = [];
+        loadFeaturesList([]);
+        loadCategoryCheckboxes([]);
+        loadDurationsInForm([]);
+        currentProduct = null;
+    }
+    
+    modal.style.display = 'flex';
+}
+
+// Override handleProductSubmit to use new features system
+const originalHandleProductSubmit = handleProductSubmit;
+function handleProductSubmit(e) {
+    e.preventDefault();
+    
+    if (currentFeatures.length === 0) {
+        showNotification('Please add at least one feature', 3000);
+        return;
+    }
+    
+    const productId = document.getElementById('product-id').value;
+    const name = document.getElementById('product-name').value;
+    const badge = document.getElementById('product-badge').value;
+    const price = parseFloat(document.getElementById('product-price').value);
+    const period = document.getElementById('product-period').value;
+    const description = document.getElementById('product-description').value;
+    const image = document.getElementById('product-image').value;
+    const status = document.getElementById('product-status').value;
+    const featured = document.getElementById('product-featured').checked;
+    const categories = getSelectedCategories();
+    
+    let products = getProducts();
+    
+    if (productId) {
+        // Edit existing product
+        const index = products.findIndex(p => p.id == productId);
+        if (index !== -1) {
+            products[index] = {
+                ...products[index],
+                name,
+                badge,
+                price,
+                period,
+                features: currentFeatures,
+                description,
+                image,
+                status,
+                featured,
+                categories,
+                durations: currentDurations
+            };
+        }
+    } else {
+        // Add new product
+        const newProduct = {
+            id: Date.now(),
+            name,
+            badge,
+            price,
+            period,
+            features: currentFeatures,
+            description,
+            image,
+            status,
+            featured,
+            categories,
+            durations: currentDurations
+        };
+        products.push(newProduct);
+    }
+    
+    saveProducts(products);
+    loadProductsList();
+    closeProductModal();
+    showNotification(productId ? 'Product updated successfully' : 'Product added successfully');
+}
+
+// ==================== Initialize Enhanced Admin Features ====================
+
+// Add event listeners for new features
+document.addEventListener('DOMContentLoaded', () => {
+    // Category management
+    const addCategoryBtn = document.getElementById('add-category-btn');
+    if (addCategoryBtn) {
+        addCategoryBtn.addEventListener('click', () => openCategoryModal());
+    }
+    
+    const closeCategoryBtn = document.getElementById('close-category-modal');
+    if (closeCategoryBtn) {
+        closeCategoryBtn.addEventListener('click', closeCategoryModal);
+    }
+    
+    const cancelCategoryBtn = document.getElementById('cancel-category-modal');
+    if (cancelCategoryBtn) {
+        cancelCategoryBtn.addEventListener('click', closeCategoryModal);
+    }
+    
+    const categoryForm = document.getElementById('category-form');
+    if (categoryForm) {
+        categoryForm.addEventListener('submit', handleCategorySubmit);
+    }
+    
+    // Features management
+    const addFeatureBtn = document.getElementById('add-feature-btn');
+    if (addFeatureBtn) {
+        addFeatureBtn.addEventListener('click', addFeature);
+    }
+    
+    const newFeatureInput = document.getElementById('new-feature-input');
+    if (newFeatureInput) {
+        newFeatureInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addFeature();
+            }
+        });
+    }
+    
+    // Update tab switching to include categories tab
+    document.querySelectorAll('.admin-nav-link[data-tab]').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const tab = link.dataset.tab;
+            
+            // Update active link
+            document.querySelectorAll('.admin-nav-link').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+            
+            // Update active tab
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(`${tab}-tab`).classList.add('active');
+            
+            // Load data for the tab
+            if (tab === 'categories') {
+                loadCategoriesList();
+            } else if (tab === 'products') {
+                loadProductsList();
+            } else if (tab === 'status') {
+                loadStatusList();
+            }
+        });
+    });
+});
+
+// Make functions globally accessible
+window.editCategory = editCategory;
+window.deleteCategory = deleteCategory;
+window.removeFeature = removeFeature;
+window.openProductModal = openProductModal;
+window.handleProductSubmit = handleProductSubmit;
+

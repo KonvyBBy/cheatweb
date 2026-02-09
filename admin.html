@@ -42,6 +42,7 @@
             </div>
             <ul class="admin-nav-menu">
                 <li><a href="#" class="admin-nav-link active" data-tab="products">Products</a></li>
+                <li><a href="#" class="admin-nav-link" data-tab="categories">Categories</a></li>
                 <li><a href="#" class="admin-nav-link" data-tab="status">Status Page</a></li>
                 <li><a href="index.html" class="admin-nav-link">View Site</a></li>
                 <li><a href="#" class="admin-nav-link" id="logout-btn">Logout</a></li>
@@ -59,6 +60,18 @@
 
                 <div class="products-list" id="products-list">
                     <!-- Products will be dynamically loaded here -->
+                </div>
+            </div>
+
+            <!-- Categories Management Tab -->
+            <div id="categories-tab" class="admin-tab">
+                <div class="admin-header">
+                    <h1>Category Management</h1>
+                    <button class="btn btn-primary" id="add-category-btn">+ Add Category</button>
+                </div>
+
+                <div class="categories-list" id="categories-list">
+                    <!-- Categories will be dynamically loaded here -->
                 </div>
             </div>
 
@@ -112,13 +125,26 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="product-features">Features (one per line)</label>
-                    <textarea id="product-features" rows="6" required></textarea>
+                    <label>Features</label>
+                    <div id="features-list-container" class="features-list-container">
+                        <!-- Feature items will be added here -->
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                        <input type="text" id="new-feature-input" placeholder="Add a feature..." style="flex: 1;">
+                        <button type="button" class="btn btn-secondary btn-small" id="add-feature-btn">+ Add</button>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="product-description">Description</label>
                     <textarea id="product-description" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Categories</label>
+                    <div id="product-categories" class="categories-checkboxes">
+                        <!-- Category checkboxes will be loaded here -->
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -154,6 +180,34 @@
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Save Product</button>
                     <button type="button" class="btn btn-secondary" id="cancel-modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Category Edit Modal -->
+    <div id="category-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="category-modal-title">Add Category</h2>
+                <button class="modal-close" id="close-category-modal">&times;</button>
+            </div>
+            <form id="category-form" class="product-form">
+                <input type="hidden" id="category-id">
+                
+                <div class="form-group">
+                    <label for="category-name">Category Name</label>
+                    <input type="text" id="category-name" placeholder="e.g., Fortnite Cheats" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="category-description">Description (Optional)</label>
+                    <textarea id="category-description" rows="2" placeholder="Brief description of the category"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Category</button>
+                    <button type="button" class="btn btn-secondary" id="cancel-category-modal">Cancel</button>
                 </div>
             </form>
         </div>
