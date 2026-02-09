@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Astral Cheats</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <h1 class="logo-text">ASTRAL <span class="logo-accent">ADMIN</span></h1>
+                <p class="login-subtitle">Administrator Access</p>
+            </div>
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <label for="admin-password">Admin Password</label>
+                    <input 
+                        type="password" 
+                        id="admin-password" 
+                        placeholder="Enter admin password"
+                        autocomplete="off"
+                        required
+                    >
+                </div>
+                <button type="submit" class="btn btn-primary">Access Panel</button>
+                <p id="login-error" class="login-error"></p>
+            </form>
+            <a href="index.html" class="back-link">← Back to Home</a>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="admin-panel" class="admin-panel" style="display: none;">
+        <!-- Admin Navigation -->
+        <nav class="admin-nav">
+            <div class="admin-nav-header">
+                <h2>ASTRAL ADMIN</h2>
+            </div>
+            <ul class="admin-nav-menu">
+                <li><a href="#" class="admin-nav-link active" data-tab="products">Products</a></li>
+                <li><a href="#" class="admin-nav-link" data-tab="status">Status Page</a></li>
+                <li><a href="index.html" class="admin-nav-link">View Site</a></li>
+                <li><a href="#" class="admin-nav-link" id="logout-btn">Logout</a></li>
+            </ul>
+        </nav>
+
+        <!-- Admin Content -->
+        <div class="admin-content">
+            <!-- Products Management Tab -->
+            <div id="products-tab" class="admin-tab active">
+                <div class="admin-header">
+                    <h1>Product Management</h1>
+                    <button class="btn btn-primary" id="add-product-btn">+ Add Product</button>
+                </div>
+
+                <div class="products-list" id="products-list">
+                    <!-- Products will be dynamically loaded here -->
+                </div>
+            </div>
+
+            <!-- Status Page Management Tab -->
+            <div id="status-tab" class="admin-tab">
+                <div class="admin-header">
+                    <h1>Status Management</h1>
+                    <p class="admin-subtitle">Manage product status visibility</p>
+                </div>
+
+                <div class="status-list" id="status-list">
+                    <!-- Status items will be dynamically loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Edit Modal -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Edit Product</h2>
+                <button class="modal-close" id="close-modal">&times;</button>
+            </div>
+            <form id="product-form" class="product-form">
+                <input type="hidden" id="product-id">
+                
+                <div class="form-group">
+                    <label for="product-name">Product Name</label>
+                    <input type="text" id="product-name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-badge">Badge</label>
+                    <input type="text" id="product-badge" placeholder="e.g., Popular, New, Updated">
+                </div>
+
+                <div class="form-group">
+                    <label for="product-price">Price ($)</label>
+                    <input type="number" id="product-price" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-period">Billing Period</label>
+                    <select id="product-period">
+                        <option value="/month">Monthly</option>
+                        <option value="/week">Weekly</option>
+                        <option value="/year">Yearly</option>
+                        <option value="">One-time</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-features">Features (one per line)</label>
+                    <textarea id="product-features" rows="6" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-description">Description</label>
+                    <textarea id="product-description" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-image">Image URL</label>
+                    <input type="text" id="product-image" placeholder="https://example.com/image.jpg">
+                </div>
+
+                <div class="form-group">
+                    <label for="product-status">Status</label>
+                    <select id="product-status">
+                        <option value="working" data-color="green">✓ Working / Updated (Green)</option>
+                        <option value="caution" data-color="orange">⚠ Working - Use at Own Risk (Orange)</option>
+                        <option value="updating" data-color="blue">🔄 Updating (Blue)</option>
+                        <option value="offline" data-color="red">✗ Offline (Red)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="product-featured">
+                        Featured Product
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Product</button>
+                    <button type="button" class="btn btn-secondary" id="cancel-modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification-toast" class="notification-toast">
+        <span id="toast-message"></span>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>
