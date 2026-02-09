@@ -243,7 +243,16 @@ class AnimatedCounters {
                 if (entry.isIntersecting && !this.animated) {
                     this.animated = true;
                     this.counters.forEach(counter => {
-                        const target = parseFloat(counter.dataset.target);
+                        const label = counter.nextElementSibling?.textContent;
+                        let target;
+                        
+                        // For Active Users, use dynamic calculation
+                        if (label === 'Active Users') {
+                            target = getActiveUsers();
+                        } else {
+                            target = parseFloat(counter.dataset.target);
+                        }
+                        
                         animateCounter(counter, target, 2000);
                     });
                 }
@@ -510,7 +519,6 @@ function loadProducts() {
     
     container.innerHTML = products.map((product, index) => {
         const imageUrl = product.image || getDefaultImage(product.name);
-        const activeUsers = getActiveUsers();
         const lowestPrice = product.durations && product.durations.length > 0 
             ? Math.min(...product.durations.map(d => d.price))
             : product.price || 0;
@@ -523,16 +531,6 @@ function loadProducts() {
                 </div>
                 <div class="product-card-content">
                     <h3 class="product-card-title">${product.name}</h3>
-                    <div class="product-card-stats">
-                        <div class="stat-item">
-                            <span class="stat-icon">⭐</span>
-                            <span class="stat-value">4.8</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-icon">👥</span>
-                            <span class="stat-value">${activeUsers} Active</span>
-                        </div>
-                    </div>
                     <div class="product-card-status ${getStatusClass(product.status)}">
                         ${getStatusText(product.status)}
                     </div>
