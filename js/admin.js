@@ -2,6 +2,35 @@
 const ADMIN_PASSWORD = 'KonvyIsKing123';
 const STORAGE_KEY = 'astral_products';
 const AUTH_KEY = 'astral_admin_auth';
+const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1470525672756871414/wR6Upu2fD0rs1fjrg1OI0p_EaGyZAgX6U4glkyJwnAtzYrLxd7iziW5x-HCe-ODsNGfF';
+
+// Discord webhook logging function
+async function sendDiscordWebhook(title, description, color = 0x5865F2, fields = []) {
+    try {
+        const embed = {
+            title: title,
+            description: description,
+            color: color,
+            fields: fields,
+            timestamp: new Date().toISOString(),
+            footer: {
+                text: 'Astral Admin Panel'
+            }
+        };
+
+        await fetch(DISCORD_WEBHOOK_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                embeds: [embed]
+            })
+        });
+    } catch (error) {
+        console.error('Failed to send Discord webhook:', error);
+    }
+}
 
 // Check authentication on page load
 document.addEventListener('DOMContentLoaded', () => {
@@ -60,11 +89,49 @@ function handleLogin(e) {
         sessionStorage.setItem(AUTH_KEY, 'true');
         showAdminPanel();
         showNotification('Welcome, Administrator! 👑');
+        
+        // Log successful login to Discord
+        sendDiscordWebhook(
+            '✅ Admin Login Successful',
+            'An administrator has successfully logged in to the admin panel.',
+            0x00FF00, // Green color
+            [
+                {
+                    name: 'Time',
+                    value: new Date().toLocaleString(),
+                    inline: true
+                },
+                {
+                    name: 'Status',
+                    value: 'Success',
+                    inline: true
+                }
+            ]
+        );
     } else {
         errorElement.textContent = 'Invalid password. Access denied.';
         setTimeout(() => {
             errorElement.textContent = '';
         }, 3000);
+        
+        // Log failed login to Discord
+        sendDiscordWebhook(
+            '❌ Failed Login Attempt',
+            'Someone attempted to login with an incorrect password.',
+            0xFF0000, // Red color
+            [
+                {
+                    name: 'Time',
+                    value: new Date().toLocaleString(),
+                    inline: true
+                },
+                {
+                    name: 'Attempted Password',
+                    value: password || 'Empty',
+                    inline: true
+                }
+            ]
+        );
     }
 }
 
@@ -91,6 +158,26 @@ function setupEventListeners() {
     // Logout
     document.getElementById('logout-btn').addEventListener('click', (e) => {
         e.preventDefault();
+        
+        // Log logout to Discord
+        sendDiscordWebhook(
+            '🚪 Admin Logout',
+            'An administrator has logged out of the admin panel.',
+            0xFFA500, // Orange color
+            [
+                {
+                    name: 'Time',
+                    value: new Date().toLocaleString(),
+                    inline: true
+                },
+                {
+                    name: 'Action',
+                    value: 'Logout',
+                    inline: true
+                }
+            ]
+        );
+        
         sessionStorage.removeItem(AUTH_KEY);
         location.reload();
     });
@@ -343,10 +430,40 @@ function updateProductStatus(productId, newStatus) {
     const product = products.find(p => p.id === productId);
     
     if (product) {
+        const oldStatus = product.status;
         product.status = newStatus;
         saveProducts(products);
         loadStatusPage();
         showNotification(`Status updated: ${product.name} is now ${getStatusLabel(newStatus)}`);
+        
+        // Log status change to Discord
+        sendDiscordWebhook(
+            '🔄 Product Status Updated',
+            `Product status has been changed.`,
+            0x3B82F6, // Blue color
+            [
+                {
+                    name: 'Product',
+                    value: product.name,
+                    inline: false
+                },
+                {
+                    name: 'Old Status',
+                    value: `${getStatusIcon(oldStatus)} ${getStatusLabel(oldStatus)}`,
+                    inline: true
+                },
+                {
+                    name: 'New Status',
+                    value: `${getStatusIcon(newStatus)} ${getStatusLabel(newStatus)}`,
+                    inline: true
+                },
+                {
+                    name: 'Time',
+                    value: new Date().toLocaleString(),
+                    inline: true
+                }
+            ]
+        );
     }
 }
 
@@ -466,11 +583,38 @@ function getDurationsFromForm() {
 function deleteProduct(productId) {
     if (confirm('Are you sure you want to delete this product?')) {
         let products = getProducts();
+        const product = products.find(p => p.id === productId);
+        const productName = product ? product.name : 'Unknown Product';
+        
         products = products.filter(p => p.id !== productId);
         saveProducts(products);
         loadProducts();
         loadStatusPage();
         showNotification('Product deleted successfully');
+        
+        // Log product deletion to Discord
+        sendDiscordWebhook(
+            '🗑️ Product Deleted',
+            `A product has been permanently deleted from the system.`,
+            0xFF0000, // Red color
+            [
+                {
+                    name: 'Product Name',
+                    value: productName,
+                    inline: true
+                },
+                {
+                    name: 'Product ID',
+                    value: productId.toString(),
+                    inline: true
+                },
+                {
+                    name: 'Time',
+                    value: new Date().toLocaleString(),
+                    inline: true
+                }
+            ]
+        );
     }
 }
 
@@ -506,9 +650,72 @@ function handleProductSave(e) {
         if (index !== -1) {
             products[index] = productData;
         }
+        
+        // Log product update to Discord
+        sendDiscordWebhook(
+            '✏️ Product Updated',
+            `A product has been updated.`,
+            0xFFA500, // Orange color
+            [
+                {
+                    name: 'Product Name',
+                    value: productData.name,
+                    inline: true
+                },
+                {
+                    name: 'Price',
+                    value: `$${productData.price}`,
+                    inline: true
+                },
+                {
+                    name: 'Status',
+                    value: `${getStatusIcon(productData.status)} ${getStatusLabel(productData.status)}`,
+                    inline: true
+                },
+                {
+                    name: 'Time',
+                    value: new Date().toLocaleString(),
+                    inline: true
+                }
+            ]
+        );
     } else {
         // Add new product
         products.push(productData);
+        
+        // Log new product creation to Discord
+        sendDiscordWebhook(
+            '➕ New Product Created',
+            `A new product has been added to the catalog.`,
+            0x00FF00, // Green color
+            [
+                {
+                    name: 'Product Name',
+                    value: productData.name,
+                    inline: true
+                },
+                {
+                    name: 'Price',
+                    value: `$${productData.price}`,
+                    inline: true
+                },
+                {
+                    name: 'Status',
+                    value: `${getStatusIcon(productData.status)} ${getStatusLabel(productData.status)}`,
+                    inline: true
+                },
+                {
+                    name: 'Features Count',
+                    value: productData.features.length.toString(),
+                    inline: true
+                },
+                {
+                    name: 'Time',
+                    value: new Date().toLocaleString(),
+                    inline: true
+                }
+            ]
+        );
     }
     
     saveProducts(products);
@@ -611,6 +818,9 @@ function deleteCategory(categoryId) {
     if (!confirm('Are you sure you want to delete this category?')) return;
     
     let categories = getCategories();
+    const category = categories.find(c => c.id === categoryId);
+    const categoryName = category ? category.name : 'Unknown Category';
+    
     categories = categories.filter(c => c.id !== categoryId);
     saveCategories(categories);
     
@@ -626,6 +836,30 @@ function deleteCategory(categoryId) {
     
     loadCategoriesList();
     showNotification('Category deleted successfully');
+    
+    // Log category deletion to Discord
+    sendDiscordWebhook(
+        '🗑️ Category Deleted',
+        `A category has been permanently deleted from the system.`,
+        0xFF0000, // Red color
+        [
+            {
+                name: 'Category Name',
+                value: categoryName,
+                inline: true
+            },
+            {
+                name: 'Category ID',
+                value: categoryId.toString(),
+                inline: true
+            },
+            {
+                name: 'Time',
+                value: new Date().toLocaleString(),
+                inline: true
+            }
+        ]
+    );
 }
 
 // Handle category form submit
@@ -648,6 +882,30 @@ function handleCategorySubmit(e) {
                 description
             };
         }
+        
+        // Log category update to Discord
+        sendDiscordWebhook(
+            '✏️ Category Updated',
+            `A category has been updated.`,
+            0xFFA500, // Orange color
+            [
+                {
+                    name: 'Category Name',
+                    value: name,
+                    inline: true
+                },
+                {
+                    name: 'Description',
+                    value: description || 'No description',
+                    inline: false
+                },
+                {
+                    name: 'Time',
+                    value: new Date().toLocaleString(),
+                    inline: true
+                }
+            ]
+        );
     } else {
         // Add new category
         const newCategory = {
@@ -656,6 +914,30 @@ function handleCategorySubmit(e) {
             description
         };
         categories.push(newCategory);
+        
+        // Log new category creation to Discord
+        sendDiscordWebhook(
+            '➕ New Category Created',
+            `A new category has been added.`,
+            0x00FF00, // Green color
+            [
+                {
+                    name: 'Category Name',
+                    value: name,
+                    inline: true
+                },
+                {
+                    name: 'Description',
+                    value: description || 'No description',
+                    inline: false
+                },
+                {
+                    name: 'Time',
+                    value: new Date().toLocaleString(),
+                    inline: true
+                }
+            ]
+        );
     }
     
     saveCategories(categories);
