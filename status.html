@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Astral Cheats Status Page - Check the current status of all our products">
+    <title>Status - Astral Cheats</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .status-page {
+            min-height: 100vh;
+            padding: 120px 0 80px;
+        }
+
+        .status-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .status-grid {
+            display: grid;
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .status-card {
+            background: rgba(26, 26, 36, 0.6);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(168, 85, 247, 0.2);
+            border-radius: 25px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .status-card:hover {
+            border-color: var(--primary-purple);
+            box-shadow: 0 10px 40px var(--glow-purple);
+            transform: translateY(-5px);
+        }
+
+        .status-indicator-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .status-indicator-large.status-working {
+            background: rgba(34, 197, 94, 0.2);
+            border: 3px solid #22c55e;
+            color: #22c55e;
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.5);
+            animation: pulseGreen 2s ease-in-out infinite;
+        }
+
+        .status-indicator-large.status-caution {
+            background: rgba(249, 115, 22, 0.2);
+            border: 3px solid #f97316;
+            color: #f97316;
+            box-shadow: 0 0 30px rgba(249, 115, 22, 0.5);
+            animation: pulseOrange 2s ease-in-out infinite;
+        }
+
+        .status-indicator-large.status-updating {
+            background: rgba(59, 130, 246, 0.2);
+            border: 3px solid #3b82f6;
+            color: #3b82f6;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+            animation: pulseBlue 2s ease-in-out infinite;
+        }
+
+        .status-indicator-large.status-offline {
+            background: rgba(239, 68, 68, 0.2);
+            border: 3px solid #ef4444;
+            color: #ef4444;
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.5);
+        }
+
+        @keyframes pulseGreen {
+            0%, 100% {
+                box-shadow: 0 0 30px rgba(34, 197, 94, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(34, 197, 94, 0.8);
+            }
+        }
+
+        @keyframes pulseOrange {
+            0%, 100% {
+                box-shadow: 0 0 30px rgba(249, 115, 22, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(249, 115, 22, 0.8);
+            }
+        }
+
+        @keyframes pulseBlue {
+            0%, 100% {
+                box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+                transform: rotate(0deg);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(59, 130, 246, 0.8);
+                transform: rotate(180deg);
+            }
+        }
+
+        .status-content {
+            flex: 1;
+        }
+
+        .status-content h3 {
+            color: var(--text-primary);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-label {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-label.status-working {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .status-label.status-caution {
+            background: rgba(249, 115, 22, 0.2);
+            color: #f97316;
+        }
+
+        .status-label.status-updating {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .status-label.status-offline {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .status-description {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .overall-status {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(26, 26, 36, 0.4);
+            border-radius: 20px;
+            border: 2px solid rgba(168, 85, 247, 0.2);
+        }
+
+        .overall-status h2 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .last-updated {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .status-card {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <span class="logo-text">ASTRAL</span>
+                <span class="logo-accent">CHEATS</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="index.html#features" class="nav-link">Features</a></li>
+                <li><a href="index.html#products" class="nav-link">Products</a></li>
+                <li><a href="status.html" class="nav-link">Status</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Particle Background -->
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- Status Page -->
+    <section class="status-page">
+        <div class="container">
+            <div class="status-header fade-in-up">
+                <h1 class="section-title">System Status</h1>
+                <p class="section-subtitle">Real-time status of all Astral Cheats products</p>
+            </div>
+
+            <div class="overall-status fade-in-up">
+                <h2>Overall System Status</h2>
+                <p id="overall-status-text" class="status-label status-working">All Systems Operational</p>
+            </div>
+
+            <div class="status-grid" id="status-grid">
+                <!-- Status cards will be dynamically loaded here -->
+            </div>
+
+            <p class="last-updated" id="last-updated">Last updated: <span id="update-time"></span></p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-section">
+                <h4 class="footer-title">Astral Cheats</h4>
+                <p class="footer-description">Premium gaming cheats for competitive advantage.</p>
+            </div>
+            <div class="footer-section">
+                <h4 class="footer-title">Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html#products">Products</a></li>
+                    <li><a href="index.html#features">Features</a></li>
+                    <li><a href="status.html">Status</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4 class="footer-title">Legal</h4>
+                <ul class="footer-links">
+                    <li><a href="#terms">Terms of Service</a></li>
+                    <li><a href="#privacy">Privacy Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Astral Cheats. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Cursor Glow -->
+    <div id="cursor-glow"></div>
+
+    <script src="js/script.js"></script>
+    <script src="js/status.js"></script>
+</body>
+</html>
