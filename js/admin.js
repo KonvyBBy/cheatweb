@@ -848,7 +848,7 @@ function handleProductSubmit(e) {
     
     saveProducts(products);
     loadProducts();
-    closeProductModal();
+    closeModal();
     showNotification(productId ? 'Product updated successfully' : 'Product added successfully');
 }
 
@@ -930,5 +930,81 @@ window.handleProductSubmit = handleProductSubmit;
 // Override editProduct to use new openProductModal
 window.editProduct = function(productId) {
     openProductModal(productId);
+};
+
+
+// Override handleProductSave to use new system
+window.handleProductSave = function(e) {
+    e.preventDefault();
+    
+    if (currentFeatures.length === 0) {
+        showNotification('Please add at least one feature', 3000);
+        return;
+    }
+    
+    const productId = document.getElementById('product-id').value;
+    const name = document.getElementById('product-name').value;
+    const badge = document.getElementById('product-badge').value;
+    const price = parseFloat(document.getElementById('product-price').value);
+    const period = document.getElementById('product-period').value;
+    const description = document.getElementById('product-description').value;
+    const image = document.getElementById('product-image').value;
+    const status = document.getElementById('product-status').value;
+    const featured = document.getElementById('product-featured').checked;
+    const categories = getSelectedCategories();
+    
+    // Get durations from the original system
+    const durations = [];
+    document.querySelectorAll('.duration-field').forEach(field => {
+        const label = field.querySelector('.duration-label-input').value;
+        const days = parseInt(field.querySelector('.duration-days-input').value);
+        const durationPrice = parseFloat(field.querySelector('.duration-price-input').value);
+        durations.push({ label, days, price: durationPrice });
+    });
+    
+    let products = getProducts();
+    
+    if (productId) {
+        // Edit existing product
+        const index = products.findIndex(p => p.id == productId);
+        if (index !== -1) {
+            products[index] = {
+                ...products[index],
+                name,
+                badge,
+                price,
+                period,
+                features: currentFeatures,
+                description,
+                image,
+                status,
+                featured,
+                categories,
+                durations
+            };
+        }
+    } else {
+        // Add new product
+        const newProduct = {
+            id: Date.now(),
+            name,
+            badge,
+            price,
+            period,
+            features: currentFeatures,
+            description,
+            image,
+            status,
+            featured,
+            categories,
+            durations
+        };
+        products.push(newProduct);
+    }
+    
+    saveProducts(products);
+    loadProducts();
+    closeModal();
+    showNotification(productId ? 'Product updated successfully' : 'Product added successfully');
 };
 
