@@ -871,6 +871,38 @@ section {
         grid-template-columns: 1fr;
     }
     
+    .products-grid {
+        gap: 1.5rem;
+    }
+    
+    .product-card {
+        padding: 1.5rem;
+    }
+    
+    .product-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .product-badge {
+        position: static;
+        display: inline-block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-title {
+        font-size: 1.3rem;
+    }
+    
+    .product-features {
+        padding-left: 1rem;
+    }
+    
+    .feature-card {
+        padding: 1.5rem;
+    }
+    
     .footer-container {
         grid-template-columns: 1fr;
         text-align: center;
@@ -1920,6 +1952,28 @@ section {
         overflow-x: auto;
         justify-content: flex-start;
         padding-bottom: 0.5rem;
+    }
+    
+    .category-tab {
+        white-space: nowrap;
+        font-size: 0.9rem;
+        padding: 0.6rem 1rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .section-subtitle {
+        font-size: 1rem;
+    }
+    
+    .container {
+        padding: 0 1rem;
+    }
+    
+    section {
+        padding: 3rem 0;
     }
 }
 

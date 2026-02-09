@@ -591,12 +591,12 @@ function openCategoryModal(categoryId = null) {
         currentCategory = null;
     }
     
-    modal.style.display = 'flex';
+    modal.classList.add('show');
 }
 
 // Close category modal
 function closeCategoryModal() {
-    document.getElementById('category-modal').style.display = 'none';
+    document.getElementById('category-modal').classList.remove('show');
     document.getElementById('category-form').reset();
     currentCategory = null;
 }
@@ -797,49 +797,43 @@ function handleProductSubmit(e) {
     
     const productId = document.getElementById('product-id').value;
     const name = document.getElementById('product-name').value;
-    const badge = document.getElementById('product-badge').value;
     const price = parseFloat(document.getElementById('product-price').value);
-    const period = document.getElementById('product-period').value;
     const description = document.getElementById('product-description').value;
     const image = document.getElementById('product-image').value;
     const status = document.getElementById('product-status').value;
-    const featured = document.getElementById('product-featured').checked;
     const categories = getSelectedCategories();
     
     let products = getProducts();
     
     if (productId) {
-        // Edit existing product
+        // Edit existing product - preserve badge, period, and featured from original
         const index = products.findIndex(p => p.id == productId);
         if (index !== -1) {
             products[index] = {
                 ...products[index],
                 name,
-                badge,
                 price,
-                period,
                 features: currentFeatures,
                 description,
                 image,
                 status,
-                featured,
                 categories,
                 durations: currentDurations
             };
         }
     } else {
-        // Add new product
+        // Add new product with default values
         const newProduct = {
             id: Date.now(),
             name,
-            badge,
+            badge: '',
             price,
-            period,
+            period: '/month',
             features: currentFeatures,
             description,
             image,
             status,
-            featured,
+            featured: false,
             categories,
             durations: currentDurations
         };
