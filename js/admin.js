@@ -782,7 +782,7 @@ function openProductModal(productId = null) {
         currentProduct = null;
     }
     
-    modal.style.display = 'flex';
+    modal.classList.add('show');
 }
 
 // Override handleProductSubmit to use new features system
