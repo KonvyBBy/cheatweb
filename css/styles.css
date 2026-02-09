@@ -1163,7 +1163,7 @@ section {
     display: grid;
     grid-template-columns: 300px 1fr;
     gap: 2rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .product-modal-image-wrapper {
@@ -1198,16 +1198,18 @@ section {
 
 .product-modal-meta {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    align-items: center;
+    gap: 1.2rem;
+    flex-wrap: wrap;
 }
 
 .product-modal-status {
     display: inline-block;
-    padding: 0.5rem 1rem;
-    border-radius: 15px;
+    padding: 0.4rem 0.8rem;
+    border-radius: 10px;
     font-weight: 600;
     width: fit-content;
+    font-size: 0.9rem;
 }
 
 .product-modal-status.status-working {
@@ -1235,39 +1237,44 @@ section {
 }
 
 .product-modal-stats {
-    display: flex;
-    gap: 2rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .product-modal-stats .stat-item {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 1.1rem;
+    gap: 0.3rem;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    background: transparent;
+    padding: 0;
 }
 
 .product-modal-stats .stat-icon {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
 }
 
 .product-modal-stats .stat-value {
-    font-weight: 600;
+    font-weight: 700;
     color: var(--primary-purple);
+    font-size: 1.1rem;
 }
 
 .product-modal-description {
     color: var(--text-secondary);
-    line-height: 1.8;
-    margin-bottom: 2rem;
-    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
 }
 
 .product-modal-features {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .product-modal-features h3 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     color: var(--text-primary);
     margin-bottom: 1rem;
 }
@@ -1275,51 +1282,52 @@ section {
 .product-modal-features ul {
     list-style: none;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 0.8rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.6rem;
 }
 
 .product-modal-features li {
-    padding: 0.8rem 1rem;
-    background: rgba(168, 85, 247, 0.1);
-    border-left: 3px solid var(--primary-purple);
-    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+    background: rgba(168, 85, 247, 0.08);
+    border-left: 2px solid var(--primary-purple);
+    border-radius: 6px;
     color: var(--text-secondary);
+    font-size: 0.95rem;
 }
 
 .product-modal-features li::before {
     content: '✓ ';
     color: var(--primary-purple);
     font-weight: 700;
-    margin-right: 0.5rem;
+    margin-right: 0.4rem;
 }
 
 .product-modal-pricing {
-    background: rgba(26, 26, 36, 0.6);
-    padding: 2rem;
-    border-radius: 15px;
-    border: 2px solid rgba(168, 85, 247, 0.2);
+    background: rgba(26, 26, 36, 0.4);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(168, 85, 247, 0.2);
 }
 
 .product-modal-pricing h3 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     color: var(--text-primary);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.2rem;
     text-align: center;
 }
 
 .duration-options {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
 }
 
 .duration-option {
-    padding: 1.2rem;
-    background: rgba(168, 85, 247, 0.1);
-    border: 2px solid rgba(168, 85, 247, 0.3);
-    border-radius: 15px;
+    padding: 1rem 0.8rem;
+    background: rgba(168, 85, 247, 0.08);
+    border: 1.5px solid rgba(168, 85, 247, 0.25);
+    border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
     text-align: center;
@@ -1327,27 +1335,28 @@ section {
 
 .duration-option:hover {
     border-color: var(--primary-purple);
-    transform: translateY(-3px);
-    box-shadow: 0 5px 20px var(--glow-purple);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+    background: rgba(168, 85, 247, 0.12);
 }
 
 .duration-option.selected {
     background: var(--gradient-primary);
     border-color: var(--primary-purple);
-    box-shadow: 0 5px 25px var(--glow-purple-strong);
+    box-shadow: 0 4px 20px rgba(168, 85, 247, 0.5);
 }
 
 .duration-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
 }
 
 .duration-label {
     font-weight: 600;
     color: var(--text-primary);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
 .duration-discount {

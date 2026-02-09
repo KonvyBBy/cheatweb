@@ -303,17 +303,19 @@
 .product-badge-display {
     background: var(--gradient-primary);
     color: var(--text-primary);
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.85rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
     font-weight: 600;
+    display: inline-block;
 }
 
 .product-status-text {
-    font-size: 0.9rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 8px;
     font-weight: 600;
+    display: inline-block;
 }
 
 .product-status-text.status-working {
