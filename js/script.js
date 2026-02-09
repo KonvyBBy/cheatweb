@@ -580,12 +580,11 @@ function openProductModal(productId) {
     
     currentProduct = product;
     const modal = document.getElementById('product-details-modal');
-    const imageUrl = product.image || getDefaultImage(product.name);
     
     // Populate modal content
-    document.getElementById('modal-product-image').src = imageUrl;
     document.getElementById('modal-product-name').textContent = product.name;
     document.getElementById('modal-product-badge').textContent = product.badge || '';
+    document.getElementById('modal-product-badge').style.display = product.badge ? 'inline-block' : 'none';
     document.getElementById('modal-product-status').className = `product-modal-status ${getStatusClass(product.status)}`;
     document.getElementById('modal-product-status').textContent = getStatusText(product.status);
     document.getElementById('modal-product-rating').textContent = '4.8';
