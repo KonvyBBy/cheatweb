@@ -457,18 +457,35 @@ class ProductCardEffects {
 const STORAGE_KEY = 'astral_products';
 let currentProduct = null;
 
-// Get active users based on Chicago time
+// Get active users - synchronized across all browsers for the session
 function getActiveUsers() {
-    const chicagoTime = new Date().toLocaleString("en-US", {timeZone: "America/Chicago"});
-    const hour = new Date(chicagoTime).getHours();
+    const SESSION_KEY = 'astral_active_users';
     
-    // Night hours (10 PM - 6 AM): 20-50 users
-    // Day hours (6 AM - 10 PM): 50-190 users
-    if (hour >= 22 || hour < 6) {
-        return Math.floor(Math.random() * (50 - 20 + 1)) + 20;
+    // Check if we already have a count for this session
+    let activeUsers = sessionStorage.getItem(SESSION_KEY);
+    
+    if (!activeUsers) {
+        // Generate new count based on Chicago time
+        const chicagoTime = new Date().toLocaleString("en-US", {timeZone: "America/Chicago"});
+        const hour = new Date(chicagoTime).getHours();
+        
+        // Night hours (10 PM - 6 AM): 120-135 users
+        // Day hours (6 AM - 10 PM): 145-160 users
+        let baseCount;
+        if (hour >= 22 || hour < 6) {
+            baseCount = Math.floor(Math.random() * (135 - 120 + 1)) + 120;
+        } else {
+            baseCount = Math.floor(Math.random() * (160 - 145 + 1)) + 145;
+        }
+        
+        // Store in sessionStorage for consistency
+        sessionStorage.setItem(SESSION_KEY, baseCount.toString());
+        activeUsers = baseCount;
     } else {
-        return Math.floor(Math.random() * (190 - 50 + 1)) + 50;
+        activeUsers = parseInt(activeUsers);
     }
+    
+    return activeUsers;
 }
 
 // Load products from localStorage
@@ -572,7 +589,6 @@ function openProductModal(productId) {
     document.getElementById('modal-product-status').className = `product-modal-status ${getStatusClass(product.status)}`;
     document.getElementById('modal-product-status').textContent = getStatusText(product.status);
     document.getElementById('modal-product-rating').textContent = '4.8';
-    document.getElementById('modal-product-users').textContent = `${getActiveUsers()} Active Users`;
     document.getElementById('modal-product-description').textContent = product.description || 'Premium gaming cheat with advanced features.';
     
     // Load features
@@ -802,3 +818,201 @@ if (!('scrollBehavior' in document.documentElement.style)) {
         });
     });
 }
+
+// ==================== Category Management ====================
+
+const CATEGORIES_KEY = 'astral_categories';
+let currentCategory = 'all';
+let allProducts = [];
+
+// Get categories from localStorage
+function getCategories() {
+    const categories = localStorage.getItem(CATEGORIES_KEY);
+    return categories ? JSON.parse(categories) : [];
+}
+
+// Save categories to localStorage
+function saveCategories(categories) {
+    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
+}
+
+// Load category tabs
+function loadCategoryTabs() {
+    const categories = getCategories();
+    const tabsContainer = document.getElementById('category-tabs');
+    
+    if (!tabsContainer) return;
+    
+    // Clear existing tabs except "All Products"
+    const allTab = tabsContainer.querySelector('[data-category="all"]');
+    tabsContainer.innerHTML = '';
+    tabsContainer.appendChild(allTab);
+    
+    // Add category tabs
+    categories.forEach(category => {
+        const tab = document.createElement('button');
+        tab.className = 'category-tab';
+        tab.setAttribute('data-category', category.id);
+        tab.textContent = category.name;
+        tab.addEventListener('click', () => filterByCategory(category.id));
+        tabsContainer.appendChild(tab);
+    });
+    
+    // Add click handler to "All Products" tab
+    allTab.addEventListener('click', () => filterByCategory('all'));
+}
+
+// Filter products by category
+function filterByCategory(categoryId) {
+    currentCategory = categoryId;
+    
+    // Update active tab
+    document.querySelectorAll('.category-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelector(`[data-category="${categoryId}"]`).classList.add('active');
+    
+    // Filter and display products
+    const products = getProducts();
+    let filteredProducts = products;
+    
+    if (categoryId !== 'all') {
+        filteredProducts = products.filter(product => 
+            product.categories && product.categories.includes(categoryId)
+        );
+    }
+    
+    displayFilteredProducts(filteredProducts);
+}
+
+// Display filtered products
+function displayFilteredProducts(products) {
+    const container = document.getElementById('products-grid');
+    
+    if (!container) return;
+    
+    if (products.length === 0) {
+        container.innerHTML = '<p class="empty-state-message">No products found in this category.</p>';
+        return;
+    }
+    
+    container.innerHTML = products.map((product, index) => {
+        const imageUrl = product.image || getDefaultImage(product.name);
+        const statusClass = getStatusClass(product.status);
+        const statusText = getStatusText(product.status);
+        
+        return `
+            <div class="product-card fade-in-up" data-delay="${index}">
+                <div class="product-badge ${product.featured ? 'featured' : ''}">${product.badge || 'Premium'}</div>
+                <div class="product-image">
+                    <img src="${imageUrl}" alt="${product.name}">
+                    <div class="product-overlay">
+                        <button class="btn btn-primary" onclick="openProductModal(${product.id})">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-name">${product.name}</h3>
+                    <div class="product-status ${statusClass}">
+                        <span class="status-indicator"></span>
+                        <span>${statusText}</span>
+                    </div>
+                    <p class="product-description">${product.description || 'Premium gaming cheat'}</p>
+                    <div class="product-features-preview">
+                        ${product.features.slice(0, 3).map(f => `<span class="feature-tag">✓ ${f}</span>`).join('')}
+                    </div>
+                    <div class="product-footer">
+                        <div class="product-price">
+                            <span class="price">${product.price ? '$' + product.price : 'Custom'}</span>
+                            ${product.period ? `<span class="period">${product.period}</span>` : ''}
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="openProductModal(${product.id})">
+                            Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Trigger animations
+    setTimeout(() => {
+        document.querySelectorAll('.fade-in-up').forEach((el, index) => {
+            setTimeout(() => el.classList.add('visible'), index * 100);
+        });
+    }, 100);
+}
+
+// ==================== Mobile Menu Toggle ====================
+
+function initMobileMenu() {
+    const toggle = document.getElementById('mobile-menu-toggle');
+    const menu = document.querySelector('.nav-menu');
+    
+    if (toggle && menu) {
+        toggle.addEventListener('click', () => {
+            menu.classList.toggle('active');
+            toggle.classList.toggle('active');
+        });
+        
+        // Close menu when clicking a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                menu.classList.remove('active');
+                toggle.classList.remove('active');
+            });
+        });
+    }
+}
+
+// ==================== Support Link Handler ====================
+
+function initSupportLink() {
+    const supportLink = document.getElementById('support-link');
+    if (supportLink) {
+        supportLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showNotification('Support: Join our Discord server for assistance!', 4000);
+        });
+    }
+}
+
+// ==================== Search Button Handler ====================
+
+function initSearchButton() {
+    const searchBtn = document.getElementById('search-btn');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', () => {
+            showNotification('Search feature coming soon!', 3000);
+        });
+    }
+}
+
+// ==================== Cart Button Handler ====================
+
+function initCartButton() {
+    const cartBtn = document.getElementById('cart-btn');
+    if (cartBtn) {
+        cartBtn.addEventListener('click', () => {
+            showNotification('Shopping cart feature coming soon!', 3000);
+        });
+    }
+}
+
+// ==================== Initialize Enhanced Features ====================
+
+// Update the existing DOMContentLoaded listener
+document.addEventListener('DOMContentLoaded', () => {
+    // Load category tabs
+    loadCategoryTabs();
+    
+    // Initialize mobile menu
+    initMobileMenu();
+    
+    // Initialize new button handlers
+    initSupportLink();
+    initSearchButton();
+    initCartButton();
+});
+
