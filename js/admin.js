@@ -349,13 +349,17 @@ function loadProducts() {
             </div>
             <div class="product-info">
                 <h3>${product.name}</h3>
-                <div class="product-meta">
-                    <span class="product-price">$${product.price}${product.period}</span>
+                <p class="product-features-preview">${product.features.length} features</p>
+            </div>
+            <div class="product-meta">
+                <span class="product-price">$${product.price}${product.period}</span>
+                <div class="product-badges">
                     ${product.badge ? `<span class="product-badge-display">${product.badge}</span>` : ''}
-                    <span class="product-status-text status-${product.status}">${getStatusLabel(product.status)}</span>
                     ${product.featured ? '<span class="product-badge-display">⭐ Featured</span>' : ''}
                 </div>
-                <p class="product-features-preview">${product.features.length} features</p>
+            </div>
+            <div class="product-status-column">
+                <span class="product-status-text status-${product.status}">${getStatusLabel(product.status)}</span>
             </div>
             <div class="product-actions">
                 <button class="btn btn-small btn-edit" onclick="editProduct(${product.id})">Edit</button>

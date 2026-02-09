@@ -220,144 +220,186 @@
 }
 
 .product-item {
-    background: rgba(26, 26, 36, 0.6);
+    background: linear-gradient(135deg, rgba(26, 26, 36, 0.95) 0%, rgba(30, 30, 42, 0.95) 100%);
     backdrop-filter: blur(10px);
-    border: 2px solid rgba(168, 85, 247, 0.2);
-    border-radius: 20px;
-    padding: 1.5rem;
+    border: 1px solid rgba(168, 85, 247, 0.15);
+    border-radius: 12px;
+    padding: 1.25rem;
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: 50px 2fr 1.5fr 1fr auto;
     gap: 1.5rem;
     align-items: center;
     transition: all 0.3s ease;
+    margin-bottom: 0.75rem;
 }
 
 .product-item:hover {
-    border-color: var(--primary-purple);
-    box-shadow: 0 5px 25px var(--glow-purple);
+    border-color: rgba(168, 85, 247, 0.4);
+    transform: translateX(4px);
+    box-shadow: 0 4px 20px rgba(168, 85, 247, 0.2);
 }
 
 .product-status-indicator {
-    width: 60px;
-    height: 60px;
-    border-radius: 12px;
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 700;
+    position: relative;
 }
 
 .product-status-indicator.status-working {
-    background: rgba(34, 197, 94, 0.2);
-    border: 2px solid #22c55e;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.05) 100%);
+    border: 2px solid rgba(34, 197, 94, 0.5);
     color: #22c55e;
-    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
 }
 
 .product-status-indicator.status-caution {
-    background: rgba(249, 115, 22, 0.2);
-    border: 2px solid #f97316;
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(249, 115, 22, 0.05) 100%);
+    border: 2px solid rgba(249, 115, 22, 0.5);
     color: #f97316;
-    box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
 }
 
 .product-status-indicator.status-updating {
-    background: rgba(59, 130, 246, 0.2);
-    border: 2px solid #3b82f6;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.05) 100%);
+    border: 2px solid rgba(59, 130, 246, 0.5);
     color: #3b82f6;
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
     animation: pulse 2s ease-in-out infinite;
 }
 
 .product-status-indicator.status-offline {
-    background: rgba(239, 68, 68, 0.2);
-    border: 2px solid #ef4444;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%);
+    border: 2px solid rgba(239, 68, 68, 0.5);
     color: #ef4444;
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
 }
 
 .product-info {
-    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
 }
 
 .product-info h3 {
     color: var(--text-primary);
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.product-meta {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 0.5rem;
-}
-
-.product-price {
-    color: var(--primary-purple);
-    font-size: 1.2rem;
-    font-weight: 700;
-}
-
-.product-badge-display {
-    background: var(--gradient-primary);
-    color: var(--text-primary);
-    padding: 0.2rem 0.5rem;
-    border-radius: 8px;
-    font-size: 0.75rem;
+    font-size: 1.15rem;
     font-weight: 600;
-    display: inline-block;
-}
-
-.product-status-text {
-    font-size: 0.75rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 8px;
-    font-weight: 600;
-    display: inline-block;
-}
-
-.product-status-text.status-working {
-    background: rgba(34, 197, 94, 0.2);
-    color: #22c55e;
-}
-
-.product-status-text.status-caution {
-    background: rgba(249, 115, 22, 0.2);
-    color: #f97316;
-}
-
-.product-status-text.status-updating {
-    background: rgba(59, 130, 246, 0.2);
-    color: #3b82f6;
-}
-
-.product-status-text.status-offline {
-    background: rgba(239, 68, 68, 0.2);
-    color: #ef4444;
+    margin: 0;
+    letter-spacing: -0.02em;
 }
 
 .product-features-preview {
     color: var(--text-muted);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+}
+
+.product-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.product-price {
+    color: var(--primary-purple);
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.product-badges {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.product-badge-display {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(217, 70, 239, 0.2) 100%);
+    color: var(--primary-purple);
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: inline-block;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.product-status-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.product-status-text {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    font-weight: 600;
+    display: inline-block;
+    text-align: center;
+    border: 1px solid;
+}
+
+.product-status-text.status-working {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.product-status-text.status-caution {
+    background: rgba(249, 115, 22, 0.1);
+    color: #f97316;
+    border-color: rgba(249, 115, 22, 0.3);
+}
+
+.product-status-text.status-updating {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+.product-status-text.status-offline {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
 }
 
 .product-actions {
     display: flex;
     gap: 0.5rem;
+    flex-direction: column;
 }
 
 .btn-small {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.85rem;
     border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
 }
 
 .btn-edit {
-    background: var(--primary-purple);
+    background: linear-gradient(135deg, #a855f7 0%, #d946ef 100%);
     color: var(--text-primary);
     border: none;
+}
+
+.btn-edit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+}
+
+.btn-delete {
+    background: transparent;
+    color: #ef4444;
+    border: 1.5px solid rgba(239, 68, 68, 0.5);
+}
+
+.btn-delete:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: #ef4444;
+    transform: translateY(-2px);
+}
     cursor: pointer;
     transition: all 0.3s ease;
 }
