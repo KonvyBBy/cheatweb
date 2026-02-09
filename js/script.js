@@ -892,7 +892,7 @@ function displayFilteredProducts(products) {
     if (!container) return;
     
     if (products.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: var(--text-muted); grid-column: 1/-1;">No products found in this category.</p>';
+        container.innerHTML = '<p class="empty-state-message">No products found in this category.</p>';
         return;
     }
     
