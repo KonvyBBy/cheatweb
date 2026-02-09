@@ -768,7 +768,7 @@ function openProductModal(productId = null) {
         loadCategoryCheckboxes(product.categories || []);
         
         // Load durations
-        loadDurationsInForm(product.durations || []);
+        loadDurations(product.durations || []);
         
         currentProduct = product;
     } else {
@@ -778,7 +778,7 @@ function openProductModal(productId = null) {
         currentFeatures = [];
         loadFeaturesList([]);
         loadCategoryCheckboxes([]);
-        loadDurationsInForm([]);
+        loadDurations([]);
         currentProduct = null;
     }
     
@@ -847,7 +847,7 @@ function handleProductSubmit(e) {
     }
     
     saveProducts(products);
-    loadProductsList();
+    loadProducts();
     closeProductModal();
     showNotification(productId ? 'Product updated successfully' : 'Product added successfully');
 }
@@ -911,9 +911,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (tab === 'categories') {
                 loadCategoriesList();
             } else if (tab === 'products') {
-                loadProductsList();
+                loadProducts();
             } else if (tab === 'status') {
-                loadStatusList();
+                loadStatusPage();
             }
         });
     });
@@ -925,4 +925,10 @@ window.deleteCategory = deleteCategory;
 window.removeFeature = removeFeature;
 window.openProductModal = openProductModal;
 window.handleProductSubmit = handleProductSubmit;
+
+
+// Override editProduct to use new openProductModal
+window.editProduct = function(productId) {
+    openProductModal(productId);
+};
 
