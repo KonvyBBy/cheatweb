@@ -443,6 +443,245 @@ class ProductCardEffects {
     }
 }
 
+// ==================== Product Management ====================
+
+const STORAGE_KEY = 'astral_products';
+let currentProduct = null;
+
+// Get active users based on Chicago time
+function getActiveUsers() {
+    const chicagoTime = new Date().toLocaleString("en-US", {timeZone: "America/Chicago"});
+    const hour = new Date(chicagoTime).getHours();
+    
+    // Night hours (10 PM - 6 AM): 20-50 users
+    // Day hours (6 AM - 10 PM): 50-190 users
+    if (hour >= 22 || hour < 6) {
+        return Math.floor(Math.random() * (50 - 20 + 1)) + 20;
+    } else {
+        return Math.floor(Math.random() * (190 - 50 + 1)) + 50;
+    }
+}
+
+// Load products from localStorage
+function getProducts() {
+    const products = localStorage.getItem(STORAGE_KEY);
+    return products ? JSON.parse(products) : [];
+}
+
+// Get status color class
+function getStatusClass(status) {
+    const statusMap = {
+        'working': 'status-working',
+        'caution': 'status-caution',
+        'updating': 'status-updating',
+        'offline': 'status-offline'
+    };
+    return statusMap[status] || 'status-working';
+}
+
+// Get status text
+function getStatusText(status) {
+    const statusMap = {
+        'working': '✓ Working',
+        'caution': '⚠ Caution',
+        'updating': '🔄 Updating',
+        'offline': '✗ Offline'
+    };
+    return statusMap[status] || 'Unknown';
+}
+
+// Get default product image
+function getDefaultImage(productName) {
+    // Using placeholder images with product name
+    return `https://via.placeholder.com/400x250/1a1a24/a855f7?text=${encodeURIComponent(productName)}`;
+}
+
+// Load and display products
+function loadProducts() {
+    const products = getProducts();
+    const container = document.getElementById('products-grid');
+    
+    if (!container) return;
+    
+    if (products.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--text-muted); grid-column: 1/-1;">No products available yet.</p>';
+        return;
+    }
+    
+    container.innerHTML = products.map((product, index) => {
+        const imageUrl = product.image || getDefaultImage(product.name);
+        const activeUsers = getActiveUsers();
+        const lowestPrice = product.durations && product.durations.length > 0 
+            ? Math.min(...product.durations.map(d => d.price))
+            : product.price || 0;
+        
+        return `
+            <div class="product-card-new fade-in-up" data-delay="${index}" data-product-id="${product.id}">
+                ${product.badge ? `<div class="product-badge-new ${product.featured ? 'featured-badge' : ''}">${product.badge}</div>` : ''}
+                <div class="product-card-image">
+                    <img src="${imageUrl}" alt="${product.name}" loading="lazy">
+                </div>
+                <div class="product-card-content">
+                    <h3 class="product-card-title">${product.name}</h3>
+                    <div class="product-card-stats">
+                        <div class="stat-item">
+                            <span class="stat-icon">⭐</span>
+                            <span class="stat-value">4.8</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">👥</span>
+                            <span class="stat-value">${activeUsers} Active</span>
+                        </div>
+                    </div>
+                    <div class="product-card-status ${getStatusClass(product.status)}">
+                        ${getStatusText(product.status)}
+                    </div>
+                    <div class="product-card-price">
+                        <span class="price-label">Starting at</span>
+                        <span class="price-amount">$${lowestPrice.toFixed(2)}</span>
+                    </div>
+                    <button class="btn btn-product-new" onclick="openProductModal(${product.id})">
+                        View Details
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Trigger animations
+    setTimeout(() => {
+        document.querySelectorAll('.fade-in-up').forEach((el, index) => {
+            setTimeout(() => el.classList.add('visible'), index * 100);
+        });
+    }, 100);
+}
+
+// Open product details modal
+function openProductModal(productId) {
+    const products = getProducts();
+    const product = products.find(p => p.id === productId);
+    
+    if (!product) return;
+    
+    currentProduct = product;
+    const modal = document.getElementById('product-details-modal');
+    const imageUrl = product.image || getDefaultImage(product.name);
+    
+    // Populate modal content
+    document.getElementById('modal-product-image').src = imageUrl;
+    document.getElementById('modal-product-name').textContent = product.name;
+    document.getElementById('modal-product-badge').textContent = product.badge || '';
+    document.getElementById('modal-product-status').className = `product-modal-status ${getStatusClass(product.status)}`;
+    document.getElementById('modal-product-status').textContent = getStatusText(product.status);
+    document.getElementById('modal-product-rating').textContent = '4.8';
+    document.getElementById('modal-product-users').textContent = `${getActiveUsers()} Active Users`;
+    document.getElementById('modal-product-description').textContent = product.description || 'Premium gaming cheat with advanced features.';
+    
+    // Load features
+    const featuresList = document.getElementById('modal-product-features');
+    featuresList.innerHTML = product.features.map(f => `<li>${f}</li>`).join('');
+    
+    // Load duration options
+    loadDurationOptions(product);
+    
+    // Show modal
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+// Load duration options
+function loadDurationOptions(product) {
+    const container = document.getElementById('duration-options');
+    const durations = product.durations || [
+        { label: '1 Day', days: 1, price: product.price * 0.1 },
+        { label: '1 Week', days: 7, price: product.price * 0.5 },
+        { label: '1 Month', days: 30, price: product.price },
+        { label: '3 Months', days: 90, price: product.price * 2.5 }
+    ];
+    
+    container.innerHTML = durations.map((duration, index) => {
+        const discount = index > 0 ? Math.round((1 - (duration.price / (product.price * (duration.days / 30)))) * 100) : 0;
+        return `
+            <div class="duration-option" onclick="selectDuration(${index})">
+                <div class="duration-header">
+                    <span class="duration-label">${duration.label}</span>
+                    ${discount > 0 ? `<span class="duration-discount">-${discount}%</span>` : ''}
+                </div>
+                <div class="duration-price">$${duration.price.toFixed(2)}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Select duration
+function selectDuration(index) {
+    const product = currentProduct;
+    if (!product) return;
+    
+    const durations = product.durations || [
+        { label: '1 Day', days: 1, price: product.price * 0.1 },
+        { label: '1 Week', days: 7, price: product.price * 0.5 },
+        { label: '1 Month', days: 30, price: product.price },
+        { label: '3 Months', days: 90, price: product.price * 2.5 }
+    ];
+    
+    const selectedDuration = durations[index];
+    
+    // Update UI
+    document.querySelectorAll('.duration-option').forEach((opt, i) => {
+        if (i === index) {
+            opt.classList.add('selected');
+        } else {
+            opt.classList.remove('selected');
+        }
+    });
+    
+    // Update price display
+    document.getElementById('selected-price').textContent = `$${selectedDuration.price.toFixed(2)}`;
+    document.getElementById('purchase-btn').disabled = false;
+}
+
+// Close product modal
+function closeProductModal() {
+    const modal = document.getElementById('product-details-modal');
+    modal.classList.remove('show');
+    document.body.style.overflow = '';
+    currentProduct = null;
+}
+
+// Purchase handler
+function handlePurchase() {
+    showNotification('Purchase feature coming soon! Check back later.');
+}
+
+// ==================== Discount Popup ====================
+
+function showDiscountPopup() {
+    const hasSeenPopup = sessionStorage.getItem('discount_popup_seen');
+    
+    if (!hasSeenPopup) {
+        setTimeout(() => {
+            const popup = document.getElementById('discount-popup');
+            popup.classList.add('show');
+            sessionStorage.setItem('discount_popup_seen', 'true');
+        }, 2000); // Show after 2 seconds
+    }
+}
+
+function closeDiscountPopup() {
+    const popup = document.getElementById('discount-popup');
+    popup.classList.remove('show');
+}
+
+function copyDiscountCode() {
+    const code = document.getElementById('discount-code-text').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+        showNotification('Discount code copied! 🎉');
+    }).catch(() => {
+        showNotification('Failed to copy code');
+    });
+}
+
 // ==================== Initialize All ====================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -459,6 +698,39 @@ document.addEventListener('DOMContentLoaded', () => {
     new ParallaxEffect();
     new ProductCardEffects();
     
+    // Load products
+    loadProducts();
+    
+    // Show discount popup
+    showDiscountPopup();
+    
+    // Setup modal event listeners
+    const closeModalBtn = document.getElementById('close-product-modal');
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', closeProductModal);
+    }
+    
+    const modalOverlay = document.querySelector('.product-modal-overlay');
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', closeProductModal);
+    }
+    
+    const purchaseBtn = document.getElementById('purchase-btn');
+    if (purchaseBtn) {
+        purchaseBtn.addEventListener('click', handlePurchase);
+    }
+    
+    // Setup discount popup event listeners
+    const closeDiscountBtn = document.getElementById('close-discount-popup');
+    if (closeDiscountBtn) {
+        closeDiscountBtn.addEventListener('click', closeDiscountPopup);
+    }
+    
+    const copyCodeBtn = document.getElementById('copy-discount-code');
+    if (copyCodeBtn) {
+        copyCodeBtn.addEventListener('click', copyDiscountCode);
+    }
+    
     // Show time-based greeting
     showTimeBasedGreeting();
     
@@ -469,6 +741,10 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('%c🚀 Astral Cheats', 'color: #a855f7; font-size: 24px; font-weight: bold; text-shadow: 0 0 10px rgba(168, 85, 247, 0.6);');
     console.log('%cWebsite initialized successfully!', 'color: #d946ef; font-size: 14px;');
 });
+
+// Make functions globally accessible
+window.openProductModal = openProductModal;
+window.selectDuration = selectDuration;
 
 // ==================== Performance Optimization ====================
 

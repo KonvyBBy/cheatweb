@@ -104,6 +104,9 @@ function setupEventListeners() {
     
     // Product form
     document.getElementById('product-form').addEventListener('submit', handleProductSave);
+    
+    // Add duration button
+    document.getElementById('add-duration-btn').addEventListener('click', addDurationField);
 }
 
 // Switch tabs
@@ -145,7 +148,13 @@ function initializeDefaultProducts() {
                 description: 'Premium Fortnite cheat with advanced features',
                 image: '',
                 status: 'working',
-                featured: false
+                featured: false,
+                durations: [
+                    { label: '1 Day', days: 1, price: 4.99 },
+                    { label: '1 Week', days: 7, price: 14.99 },
+                    { label: '1 Month', days: 30, price: 29.99 },
+                    { label: '3 Months', days: 90, price: 74.99 }
+                ]
             },
             {
                 id: 2,
@@ -163,7 +172,13 @@ function initializeDefaultProducts() {
                 description: 'Top-tier Valorant cheat for competitive play',
                 image: '',
                 status: 'working',
-                featured: true
+                featured: true,
+                durations: [
+                    { label: '1 Day', days: 1, price: 5.99 },
+                    { label: '1 Week', days: 7, price: 19.99 },
+                    { label: '1 Month', days: 30, price: 39.99 },
+                    { label: '3 Months', days: 90, price: 99.99 }
+                ]
             },
             {
                 id: 3,
@@ -181,7 +196,13 @@ function initializeDefaultProducts() {
                 description: 'Advanced Apex Legends cheat suite',
                 image: '',
                 status: 'updating',
-                featured: false
+                featured: false,
+                durations: [
+                    { label: '1 Day', days: 1, price: 4.99 },
+                    { label: '1 Week', days: 7, price: 17.49 },
+                    { label: '1 Month', days: 30, price: 34.99 },
+                    { label: '3 Months', days: 90, price: 84.99 }
+                ]
             },
             {
                 id: 4,
@@ -199,7 +220,13 @@ function initializeDefaultProducts() {
                 description: 'Comprehensive Warzone cheat package',
                 image: '',
                 status: 'working',
-                featured: false
+                featured: false,
+                durations: [
+                    { label: '1 Day', days: 1, price: 4.99 },
+                    { label: '1 Week', days: 7, price: 16.49 },
+                    { label: '1 Month', days: 30, price: 32.99 },
+                    { label: '3 Months', days: 90, price: 79.99 }
+                ]
             }
         ];
         
@@ -328,6 +355,7 @@ function openAddProductModal() {
     document.getElementById('modal-title').textContent = 'Add New Product';
     document.getElementById('product-form').reset();
     document.getElementById('product-id').value = '';
+    loadDurations([]);
     document.getElementById('product-modal').classList.add('show');
 }
 
@@ -349,8 +377,89 @@ function editProduct(productId) {
         document.getElementById('product-status').value = product.status;
         document.getElementById('product-featured').checked = product.featured || false;
         
+        // Load durations
+        loadDurations(product.durations || []);
+        
         document.getElementById('product-modal').classList.add('show');
     }
+}
+
+// Load durations into form
+function loadDurations(durations) {
+    const container = document.getElementById('durations-list');
+    container.innerHTML = '';
+    
+    if (durations.length === 0) {
+        // Add default durations
+        durations = [
+            { label: '1 Day', days: 1, price: 4.99 },
+            { label: '1 Week', days: 7, price: 14.99 },
+            { label: '1 Month', days: 30, price: 29.99 },
+            { label: '3 Months', days: 90, price: 74.99 }
+        ];
+    }
+    
+    durations.forEach((duration, index) => {
+        addDurationField(duration, index);
+    });
+}
+
+// Add duration field
+function addDurationField(duration = null, index = null) {
+    const container = document.getElementById('durations-list');
+    const durationIndex = index !== null ? index : container.children.length;
+    
+    const durationDiv = document.createElement('div');
+    durationDiv.className = 'duration-field';
+    durationDiv.innerHTML = `
+        <div class="duration-field-row">
+            <input type="text" 
+                   class="duration-label-input" 
+                   placeholder="Label (e.g., 1 Month)" 
+                   value="${duration ? duration.label : ''}"
+                   required>
+            <input type="number" 
+                   class="duration-days-input" 
+                   placeholder="Days" 
+                   value="${duration ? duration.days : ''}"
+                   min="1"
+                   required>
+            <input type="number" 
+                   class="duration-price-input" 
+                   placeholder="Price" 
+                   value="${duration ? duration.price : ''}"
+                   step="0.01"
+                   min="0"
+                   required>
+            <button type="button" class="btn-remove-duration" onclick="removeDurationField(this)">×</button>
+        </div>
+    `;
+    
+    container.appendChild(durationDiv);
+}
+
+// Remove duration field
+function removeDurationField(button) {
+    const durationField = button.closest('.duration-field');
+    durationField.remove();
+}
+
+// Get durations from form
+function getDurationsFromForm() {
+    const durations = [];
+    const durationFields = document.querySelectorAll('.duration-field');
+    
+    durationFields.forEach(field => {
+        const label = field.querySelector('.duration-label-input').value;
+        const days = parseInt(field.querySelector('.duration-days-input').value);
+        const price = parseFloat(field.querySelector('.duration-price-input').value);
+        
+        if (label && days && price >= 0) {
+            durations.push({ label, days, price });
+        }
+    });
+    
+    return durations;
 }
 
 // Delete product
@@ -387,7 +496,8 @@ function handleProductSave(e) {
         description: document.getElementById('product-description').value,
         image: document.getElementById('product-image').value,
         status: document.getElementById('product-status').value,
-        featured: document.getElementById('product-featured').checked
+        featured: document.getElementById('product-featured').checked,
+        durations: getDurationsFromForm()
     };
     
     if (productId) {
@@ -412,3 +522,4 @@ function handleProductSave(e) {
 window.editProduct = editProduct;
 window.deleteProduct = deleteProduct;
 window.updateProductStatus = updateProductStatus;
+window.removeDurationField = removeDurationField;

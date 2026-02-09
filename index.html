@@ -108,82 +108,76 @@
         <div class="container">
             <h2 class="section-title fade-in-up">Our Products</h2>
             <p class="section-subtitle fade-in-up">Premium cheats for your favorite games</p>
-            <div class="products-grid">
-                <div class="product-card fade-in-up" data-delay="0">
-                    <div class="product-badge">Popular</div>
-                    <div class="product-header">
-                        <h3 class="product-title">Fortnite</h3>
-                    </div>
-                    <ul class="product-features">
-                        <li>Aimbot with customizable FOV</li>
-                        <li>ESP & Wallhacks</li>
-                        <li>No Recoil & No Spread</li>
-                        <li>Radar & Player Info</li>
-                        <li>Auto-update system</li>
-                    </ul>
-                    <div class="product-price">
-                        <span class="price-amount">$29.99</span>
-                        <span class="price-period">/month</span>
-                    </div>
-                    <a href="#" class="btn btn-product">View Details</a>
-                </div>
-                <div class="product-card fade-in-up featured" data-delay="1">
-                    <div class="product-badge featured-badge">Featured</div>
-                    <div class="product-header">
-                        <h3 class="product-title">Valorant</h3>
-                    </div>
-                    <ul class="product-features">
-                        <li>Advanced Triggerbot</li>
-                        <li>Bone Aimbot (Head/Body)</li>
-                        <li>Agent ESP & Abilities</li>
-                        <li>Recoil Control System</li>
-                        <li>Stream-proof mode</li>
-                    </ul>
-                    <div class="product-price">
-                        <span class="price-amount">$39.99</span>
-                        <span class="price-period">/month</span>
-                    </div>
-                    <a href="#" class="btn btn-product">View Details</a>
-                </div>
-                <div class="product-card fade-in-up" data-delay="2">
-                    <div class="product-badge">New</div>
-                    <div class="product-header">
-                        <h3 class="product-title">Apex Legends</h3>
-                    </div>
-                    <ul class="product-features">
-                        <li>Smart Aimbot with prediction</li>
-                        <li>Legend ESP & Health bars</li>
-                        <li>Loot ESP with filters</li>
-                        <li>Glow effects</li>
-                        <li>Speed hack & fly mode</li>
-                    </ul>
-                    <div class="product-price">
-                        <span class="price-amount">$34.99</span>
-                        <span class="price-period">/month</span>
-                    </div>
-                    <a href="#" class="btn btn-product">View Details</a>
-                </div>
-                <div class="product-card fade-in-up" data-delay="3">
-                    <div class="product-badge">Updated</div>
-                    <div class="product-header">
-                        <h3 class="product-title">Warzone</h3>
-                    </div>
-                    <ul class="product-features">
-                        <li>Full ESP suite</li>
-                        <li>Advanced Aimbot</li>
-                        <li>2D/3D Radar</li>
-                        <li>Vehicle ESP</li>
-                        <li>No fog & weather control</li>
-                    </ul>
-                    <div class="product-price">
-                        <span class="price-amount">$32.99</span>
-                        <span class="price-period">/month</span>
-                    </div>
-                    <a href="#" class="btn btn-product">View Details</a>
-                </div>
+            <div class="products-grid" id="products-grid">
+                <!-- Products will be dynamically loaded here -->
             </div>
         </div>
     </section>
+
+    <!-- Product Details Modal -->
+    <div id="product-details-modal" class="product-modal">
+        <div class="product-modal-overlay"></div>
+        <div class="product-modal-content">
+            <button class="product-modal-close" id="close-product-modal">&times;</button>
+            <div class="product-modal-body">
+                <div class="product-modal-header">
+                    <div class="product-modal-image-wrapper">
+                        <img id="modal-product-image" src="" alt="Product Image" />
+                        <div class="product-modal-badge" id="modal-product-badge"></div>
+                    </div>
+                    <div class="product-modal-info">
+                        <h2 id="modal-product-name"></h2>
+                        <div class="product-modal-meta">
+                            <div class="product-modal-status" id="modal-product-status"></div>
+                            <div class="product-modal-stats">
+                                <div class="stat-item">
+                                    <span class="stat-icon">⭐</span>
+                                    <span class="stat-value" id="modal-product-rating">4.8</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-icon">👥</span>
+                                    <span class="stat-value" id="modal-product-users">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-modal-description" id="modal-product-description"></div>
+                <div class="product-modal-features">
+                    <h3>Features</h3>
+                    <ul id="modal-product-features"></ul>
+                </div>
+                <div class="product-modal-pricing">
+                    <h3>Select Duration</h3>
+                    <div class="duration-options" id="duration-options">
+                        <!-- Duration options will be loaded here -->
+                    </div>
+                    <div class="selected-price">
+                        <span class="price-label">Total:</span>
+                        <span class="price-value" id="selected-price">Select a duration</span>
+                    </div>
+                    <button class="btn btn-primary btn-large" id="purchase-btn" disabled>
+                        Purchase Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Discount Popup -->
+    <div id="discount-popup" class="discount-popup">
+        <div class="discount-popup-content">
+            <button class="discount-popup-close" id="close-discount-popup">&times;</button>
+            <div class="discount-popup-icon">🎉</div>
+            <h2>Welcome to Astral Cheats!</h2>
+            <p>Get <strong>10% OFF</strong> your first purchase</p>
+            <div class="discount-code">
+                <code id="discount-code-text">ASTRAL10</code>
+                <button class="btn-copy-code" id="copy-discount-code">Copy Code</button>
+            </div>
+            <p class="discount-note">Use this code at checkout</p>
+        </div>
+    </div>
 
     <!-- Trust Section -->
     <section id="trust" class="trust">
